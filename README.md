@@ -160,7 +160,7 @@ Open http://localhost:5173. For "forgot password", copy the link printed in the 
 | A11 | Open a link with a wrong or expired token | rejected |
 
 ## Team
-- <نام و نام خانوادگی اعضای تیم را اینجا بنویسید>
+MR. G
 
 ## Status
 
