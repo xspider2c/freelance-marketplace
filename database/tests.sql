@@ -19,6 +19,10 @@ DO $$ BEGIN
   UPDATE proposals SET status='accepted' WHERE id = 2;
   BEGIN UPDATE proposals SET status='accepted' WHERE id = 3;
     RAISE NOTICE 'T5 FAIL'; EXCEPTION WHEN OTHERS THEN RAISE NOTICE 'T5 PASS (second accept rejected: %)', SQLERRM; END;
+  -- T5b (FR-10) با پذیرش پیشنهاد 2، پیشنهاد pending دیگر (id=3) خودکار rejected شود
+  IF (SELECT status FROM proposals WHERE id = 3) = 'rejected' THEN
+    RAISE NOTICE 'T5b PASS (other pending proposals auto-rejected)';
+  ELSE RAISE NOTICE 'T5b FAIL'; END IF;
   -- T6 پیشنهاد روی پروژه خود
   BEGIN INSERT INTO proposals(project_id,freelancer_id,amount,cover_letter) VALUES(2,3,1,'self');
     RAISE NOTICE 'T6 FAIL'; EXCEPTION WHEN OTHERS THEN RAISE NOTICE 'T6 PASS (self-proposal rejected: %)', SQLERRM; END;

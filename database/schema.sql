@@ -1,7 +1,7 @@
 -- Freelance Marketplace - PostgreSQL 15+
 -- اجرا: psql -U postgres -d freelance_marketplace -f database/schema.sql
 
-DROP TABLE IF EXISTS proposals, project_skills, project_categories, projects,
+DROP TABLE IF EXISTS password_reset_tokens, proposals, project_skills, project_categories, projects,
   profile_skills, certificates, portfolios, user_profiles,
   skills, categories, admins, users CASCADE;
 DROP TYPE IF EXISTS account_status, pricing_type, project_status, proposal_status CASCADE;
@@ -132,6 +132,18 @@ CREATE INDEX idx_proposals_freelancer ON proposals(freelancer_id);
 -- حداکثر یک پیشنهاد پذیرفته‌شده در هر پروژه
 CREATE UNIQUE INDEX uq_one_accepted_per_project ON proposals(project_id) WHERE status = 'accepted';
 
+-- ---------- بازیابی رمز عبور ----------
+CREATE TABLE IF NOT EXISTS password_reset_tokens (
+  id         BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  user_id    BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  token_hash CHAR(64) NOT NULL UNIQUE,           -- SHA-256 توکن؛ خود توکن ذخیره نمی‌شود
+  expires_at TIMESTAMPTZ NOT NULL,
+  used_at    TIMESTAMPTZ,                         -- NULL = هنوز مصرف نشده
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  CONSTRAINT chk_reset_token_expiry CHECK (expires_at > created_at)
+);
+CREATE INDEX IF NOT EXISTS idx_reset_tokens_user ON password_reset_tokens(user_id);
+
 -- ================= Triggers =================
 CREATE OR REPLACE FUNCTION fn_touch_updated_at() RETURNS trigger AS $$
 BEGIN NEW.updated_at := now(); RETURN NEW; END $$ LANGUAGE plpgsql;
@@ -203,6 +215,9 @@ BEGIN
       RAISE EXCEPTION 'Can only accept a proposal of an open project';
     END IF;
     UPDATE projects SET status = 'in_progress' WHERE id = NEW.project_id;
+    -- FR-10: بستن بقیه پیشنهادهای در انتظار همین پروژه
+    UPDATE proposals SET status = 'rejected'
+     WHERE project_id = NEW.project_id AND id <> NEW.id AND status = 'pending';
   END IF;
   RETURN NEW;
 END $$ LANGUAGE plpgsql;

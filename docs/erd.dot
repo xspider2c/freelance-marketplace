@@ -1,0 +1,23 @@
+digraph ERD {
+  rankdir=LR; node [shape=plain, fontname="Helvetica", fontsize=10]; edge [fontname="Helvetica", fontsize=9, arrowhead=crow, arrowtail=tee, dir=both];
+  users [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" BGCOLOR="#EEF4FF"><TR><TD BGCOLOR="#3b6fd8"><FONT COLOR="white"><B>users</B></FONT></TD></TR><TR><TD ALIGN="LEFT">PK id<BR ALIGN="LEFT"/>first_name, last_name<BR ALIGN="LEFT"/>email (UQ)<BR ALIGN="LEFT"/>phone (UQ, null)<BR ALIGN="LEFT"/>password_hash<BR ALIGN="LEFT"/>status<BR ALIGN="LEFT"/>created_at, updated_at<BR ALIGN="LEFT"/></TD></TR></TABLE>>];
+  admins [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" BGCOLOR="#FFF3E0"><TR><TD BGCOLOR="#e08a00"><FONT COLOR="white"><B>admins</B></FONT></TD></TR><TR><TD ALIGN="LEFT">PK/FK user_id<BR ALIGN="LEFT"/>granted_at<BR ALIGN="LEFT"/>FK granted_by<BR ALIGN="LEFT"/></TD></TR></TABLE>>];
+  user_profiles [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" BGCOLOR="#EEF4FF"><TR><TD BGCOLOR="#3b6fd8"><FONT COLOR="white"><B>user_profiles</B></FONT></TD></TR><TR><TD ALIGN="LEFT">PK id<BR ALIGN="LEFT"/>FK user_id (UQ)<BR ALIGN="LEFT"/>headline, bio, location<BR ALIGN="LEFT"/></TD></TR></TABLE>>];
+  portfolios [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" BGCOLOR="#EEF4FF"><TR><TD BGCOLOR="#3b6fd8"><FONT COLOR="white"><B>portfolios</B></FONT></TD></TR><TR><TD ALIGN="LEFT">PK id<BR ALIGN="LEFT"/>FK profile_id<BR ALIGN="LEFT"/>title, description, url<BR ALIGN="LEFT"/></TD></TR></TABLE>>];
+  certificates [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" BGCOLOR="#EEF4FF"><TR><TD BGCOLOR="#3b6fd8"><FONT COLOR="white"><B>certificates</B></FONT></TD></TR><TR><TD ALIGN="LEFT">PK id<BR ALIGN="LEFT"/>FK profile_id<BR ALIGN="LEFT"/>title, issuer, issued_date<BR ALIGN="LEFT"/></TD></TR></TABLE>>];
+  skills [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" BGCOLOR="#E8F5E9"><TR><TD BGCOLOR="#2e8b57"><FONT COLOR="white"><B>skills</B></FONT></TD></TR><TR><TD ALIGN="LEFT">PK id<BR ALIGN="LEFT"/>name (UQ)<BR ALIGN="LEFT"/></TD></TR></TABLE>>];
+  categories [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" BGCOLOR="#E8F5E9"><TR><TD BGCOLOR="#2e8b57"><FONT COLOR="white"><B>categories</B></FONT></TD></TR><TR><TD ALIGN="LEFT">PK id<BR ALIGN="LEFT"/>title (UQ)<BR ALIGN="LEFT"/></TD></TR></TABLE>>];
+  profile_skills [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" BGCOLOR="#F3F3F3"><TR><TD BGCOLOR="gray40"><FONT COLOR="white"><B>profile_skills</B></FONT></TD></TR><TR><TD ALIGN="LEFT">PK,FK profile_id<BR ALIGN="LEFT"/>PK,FK skill_id<BR ALIGN="LEFT"/></TD></TR></TABLE>>];
+  project_skills [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" BGCOLOR="#F3F3F3"><TR><TD BGCOLOR="gray40"><FONT COLOR="white"><B>project_skills</B></FONT></TD></TR><TR><TD ALIGN="LEFT">PK,FK project_id<BR ALIGN="LEFT"/>PK,FK skill_id<BR ALIGN="LEFT"/></TD></TR></TABLE>>];
+  project_categories [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" BGCOLOR="#F3F3F3"><TR><TD BGCOLOR="gray40"><FONT COLOR="white"><B>project_categories</B></FONT></TD></TR><TR><TD ALIGN="LEFT">PK,FK project_id<BR ALIGN="LEFT"/>PK,FK category_id<BR ALIGN="LEFT"/></TD></TR></TABLE>>];
+  projects [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" BGCOLOR="#EEF4FF"><TR><TD BGCOLOR="#3b6fd8"><FONT COLOR="white"><B>projects</B></FONT></TD></TR><TR><TD ALIGN="LEFT">PK id<BR ALIGN="LEFT"/>FK employer_id<BR ALIGN="LEFT"/>title, description<BR ALIGN="LEFT"/>pricing_type, budget (&gt;0)<BR ALIGN="LEFT"/>status, deadline (null)<BR ALIGN="LEFT"/>created_at, updated_at<BR ALIGN="LEFT"/></TD></TR></TABLE>>];
+  proposals [label=<<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" BGCOLOR="#EEF4FF"><TR><TD BGCOLOR="#3b6fd8"><FONT COLOR="white"><B>proposals</B></FONT></TD></TR><TR><TD ALIGN="LEFT">PK id<BR ALIGN="LEFT"/>FK project_id, FK freelancer_id<BR ALIGN="LEFT"/>UQ(project_id, freelancer_id)<BR ALIGN="LEFT"/>amount (&gt;0), cover_letter<BR ALIGN="LEFT"/>estimated_days/hours (&gt;0)<BR ALIGN="LEFT"/>status, created_at, updated_at<BR ALIGN="LEFT"/></TD></TR></TABLE>>];
+  users -> admins [label="1:0..1", arrowhead=teeodot]; 
+  users -> user_profiles [label="1:0..1", arrowhead=teeodot];
+  user_profiles -> portfolios [label="1:N"]; user_profiles -> certificates [label="1:N"];
+  user_profiles -> profile_skills; skills -> profile_skills;
+  users -> projects [label="employer 1:N"]; users -> proposals [label="freelancer 1:N"];
+  projects -> proposals [label="1:N"];
+  projects -> project_skills; skills -> project_skills;
+  projects -> project_categories; categories -> project_categories;
+}
