@@ -162,6 +162,4 @@ Open http://localhost:5173. For "forgot password", copy the link printed in the 
 ## Team
 MR. G
 
-## Status
 
-Requirements analysis, Jira board and Git workflow (Exercise 1), database schema, ERD, sample data and tests (Exercise 2), and the authentication feature (Exercise 3) are done. Other platform features (projects, proposals UI, dashboard) have not been implemented yet.
